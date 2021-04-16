@@ -4,6 +4,7 @@ import validation  # For User input validation
 import os
 from getpass import getpass
 from database import delete_auth_session
+from database import read
 
 
 # Initialize the system
@@ -147,6 +148,7 @@ def set_current_balance(user, balance):
     if os.path.exists(database.user_db_path + str(user[0]) + ".txt"):
         try:
             f = open(database.user_db_path + str(user[0]) + ".txt", "w")
+            user = str(user[0]) + "," + user[1] + "," + user[2] + "," + user[3] + "," + user[4] + "," + str(user[5])
             f.write(user)
             f.close()
         except FileNotFoundError:
