@@ -4,7 +4,10 @@ import validation  # For User input validation
 import os
 from getpass import getpass
 from database import delete_auth_session
-from database import read
+
+# Global variables
+account_number_from_user = None
+account_number = None
 
 
 # Initialize the system
@@ -29,6 +32,7 @@ def init():
 def login():
     print("****** Login ******")
 
+    global account_number_from_user
     account_number_from_user = input("Enter your account number: \n")
     is_valid_account_number = validation.account_number_validation(account_number_from_user)
     if is_valid_account_number:
@@ -48,6 +52,7 @@ def login():
 
 
 def register():
+    global account_number
     print("****** Register ******")
 
     email = input("Enter your email address: \n")
@@ -90,12 +95,12 @@ def bank_operations(user):
 
 
 def withdrawal_operation(user):
-    print("Withdrawal")
     current_balance = int(get_current_balance(user))
     print(f" Your current balance is {current_balance}")
     amount_to_withdraw = int(input("How much do you want to withdraw? \n"))
     if amount_to_withdraw > current_balance:
         print("Insufficient Balance!")
+        withdrawal_operation(user)
     else:
         current_balance = current_balance - amount_to_withdraw
         print("Please take your cash.")
@@ -112,9 +117,6 @@ def withdrawal_operation(user):
 
 
 def deposit_operation(user):
-    print(type(user))
-    print(user)
-    print("Deposit Operations")
     current_balance = get_current_balance(user)
     amount_to_deposit = int(input("How much do you want to deposit? \n"))
     current_balance = int(current_balance) + amount_to_deposit
@@ -125,7 +127,7 @@ def deposit_operation(user):
     if user_input == 1:
         bank_operations(user)
     elif user_input == 2:
-        exit()
+        logout()
     else:
         print("Invalid option selected.")
         exit()
@@ -134,7 +136,6 @@ def deposit_operation(user):
 
 def generate_account_number():
     return random.randrange(1111111111, 9999999999)
-    # learn to to generate a user sequence account number
 
 
 def get_current_balance(user_details):
@@ -143,8 +144,6 @@ def get_current_balance(user_details):
 
 def set_current_balance(user, balance):
     user[5] = balance
-    print(type(user))
-    print(database.user_db_path + str(user[0]) + ".txt")
     if os.path.exists(database.user_db_path + str(user[0]) + ".txt"):
         try:
             f = open(database.user_db_path + str(user[0]) + ".txt", "w")
@@ -158,10 +157,8 @@ def set_current_balance(user, balance):
 
 
 def logout():
-    if login():
-        delete_auth_session(login())
-
-    # login()
+    delete_auth_session(account_number_from_user)
+    login()
 
 
 init()

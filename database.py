@@ -5,9 +5,11 @@ from datetime import datetime
 
 user_db_path = "data/user_record/"
 session_data_path = "data/auth_session/"
+f = None
 
 
 def create(user_account_number, first_name, last_name, email, password, account_balance):
+    global f
     user_data = str(
         user_account_number) + "," + first_name + "," + last_name + "," + email + "," + password + "," + str(
         account_balance)
@@ -37,9 +39,9 @@ def read(user_account_number):
     is_valid_account_number = validation.account_number_validation(user_account_number)
     try:
         if is_valid_account_number:
-            f = open(user_db_path + str(user_account_number) + ".txt", "r")
+            t = open(user_db_path + str(user_account_number) + ".txt", "r")
         else:
-            f = open(user_db_path + user_account_number, "r")
+            t = open(user_db_path + user_account_number, "r")
     except FileNotFoundError:
         print("User not found.")
     except FileExistsError:
@@ -47,12 +49,8 @@ def read(user_account_number):
     except TypeError:
         print("Invalid account number format.")
     else:
-        return f.readline()
+        return t.readline()
     return False
-
-
-def update(user_account_number):
-    print("Updating user record.")
 
 
 def delete(user_account_number):
@@ -93,6 +91,7 @@ def authenticated_user(account_number, password):
 
 
 def create_auth_session(user_account_number):
+    global f
     is_session_started = False
     session_data = str(user_account_number) + "," + str(datetime.now()) + "\n"
     try:
@@ -109,8 +108,9 @@ def create_auth_session(user_account_number):
         return is_session_started
 
 
-def delete_auth_session(user_details):
+def delete_auth_session(account_number_from_user):
     try:
-        os.remove(session_data_path + str(user_details) + ".txt")
+        if os.path.exists(session_data_path + str(account_number_from_user) + ".txt"):
+            os.remove(session_data_path + str(account_number_from_user) + ".txt")
     except FileExistsError:
-        print("....")
+        print("Session could not be deleted.")
